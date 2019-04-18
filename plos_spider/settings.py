@@ -82,8 +82,10 @@ ITEM_PIPELINES = {
 
 # export
 FEED_FORMAT = "json"
-FEED_URI = "/home/smoky05/PycharmProjects/scrapy_test/plos_spider/tmp/gravity.json"
-# FEED_URI = "s3://os.environ['AWS_ACCESS_KEY_ID']:os.environ['AWS_SECRET_ACCESS_KEY']@plos/%(name)s/%(time)s.json"
+FEED_URI = "s3://{username}:{password}@plos/%(name)s/%(time)s.json".format(
+   username=os.environ['AWS_ACCESS_KEY_ID'],
+   password=os.environ['AWS_SECRET_ACCESS_KEY'],
+)
 # FEED_EXPORT_FIELDS = ["views", "publish_date", "views_per_day", "tags",]  # for csv
 
 # Enable and configure the AutoThrottle extension (disabled by default)
