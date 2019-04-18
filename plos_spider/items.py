@@ -16,7 +16,7 @@ def extract_integer(text):
     :return: Integer
     """
     if not isinstance(text, str):
-        return
+        raise TypeError("The argument for 'extract_integer' should be a string")
 
     numbers = re.compile(r"(?P<count>\d+)")
     string_value = text.replace(",", "")
@@ -33,7 +33,7 @@ def convert_to_datetime(publish_string):
     :return: Date in datetime
     """
     if not isinstance(publish_string, str):
-        return
+        raise TypeError("The argument for 'convert_to_datetime' should be a string")
 
     publish_datetime = datetime.datetime.strptime(
         publish_string,
