@@ -31,7 +31,7 @@ ROBOTSTXT_OBEY = True
 # logging levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
 LOG_ENABLED = True
 LOG_FILE = "tmp/log.txt"
-LOG_LEVEL = "INFO"
+LOG_LEVEL = "DEBUG"
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -70,9 +70,10 @@ DOWNLOAD_DELAY = 10
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
-#EXTENSIONS = {
-#    'scrapy.extensions.telnet.TelnetConsole': None,
-#}
+MYEXT_ENABLED = True
+EXTENSIONS = {
+    "plos_spider.extensions.ClosingActions": 100,
+}
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html

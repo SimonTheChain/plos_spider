@@ -5,8 +5,6 @@ import os
 
 import scrapy
 from scrapy.loader import ItemLoader
-from scrapy.mail import MailSender
-from scrapy import signals
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -34,44 +32,6 @@ class MetricsSpider(scrapy.Spider):
         super().__init__(**kwargs)
         self.driver = webdriver.Chrome(os.environ["WEBDRIVERS_PATH"] + "chromedriver")
         self.articles_scraped = 0
-
-    @classmethod
-    def from_crawler(cls, crawler, *args, **kwargs):
-        """
-        Connects the spider signals
-        """
-        spider = super(MetricsSpider, cls).from_crawler(crawler, *args, **kwargs)
-        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
-
-        return spider
-
-    def spider_closed(self, spider):
-        """
-        Sends an email and closes the selenium driver when the spider is closed
-        """
-        mailer = MailSender(
-            smtphost="smtp.gmail.com",
-            mailfrom=os.environ["EMAIL_SENDER"],
-            smtpuser=os.environ["EMAIL_SENDER"],
-            smtppass=os.environ["SMTPPASS"],
-            smtptls=True,
-            smtpssl=True,
-            smtpport=587,
-        )
-
-        msg_body = "Web crawling job completed: {} articles scraped.".format(
-            self.articles_scraped
-        )
-
-        mailer.send(
-            to=os.environ["EMAIL_RECEIVER"],
-            subject="Web Crawling Results",
-            body=msg_body,
-            # cc=[""]
-        )
-
-        # close the selenium driver
-        self.driver.close()
 
     def parse(self, response):
         """
@@ -107,10 +67,10 @@ class MetricsSpider(scrapy.Spider):
         :return: new metrics item
         """
         # the view count is generated with javascript so we need to use selenium
-        self.driver.get(response.url)
-
-        # wait for the dynamic element to be present
         try:
+            self.driver.get(response.url)
+
+            # wait for the dynamic element to be present
             views = WebDriverWait(
                 driver=self.driver,
                 timeout=10,
