@@ -1,0 +1,11 @@
+# PLOS Spider
+
+A webcrawling project to gather info from articles published on journals.plos.org
+
+## Requirements
+
+Scrapy and Selenium
+
+## Launch
+
+`$ scrapy crawl metrics_crawler`
