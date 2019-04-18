@@ -77,14 +77,14 @@ DOWNLOAD_DELAY = 10
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'plos_spider.pipelines.ViewsPerDay': 100,
+    'plos_spider.pipelines.ViewsPerDay': 100,
 }
 
 # export
 FEED_FORMAT = "json"
 FEED_URI = "s3://{username}:{password}@plos/%(name)s/%(time)s.json".format(
-   username=os.environ['AWS_ACCESS_KEY_ID'],
-   password=os.environ['AWS_SECRET_ACCESS_KEY'],
+    username=os.environ['AWS_ACCESS_KEY_ID'],
+    password=os.environ['AWS_SECRET_ACCESS_KEY'],
 )
 # FEED_EXPORT_FIELDS = ["views", "publish_date", "views_per_day", "tags",]  # for csv
 

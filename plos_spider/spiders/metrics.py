@@ -6,6 +6,7 @@ import os
 import scrapy
 from scrapy.loader import ItemLoader
 from scrapy.mail import MailSender
+from scrapy import signals
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -34,9 +35,19 @@ class MetricsSpider(scrapy.Spider):
         self.driver = webdriver.Chrome(os.environ["WEBDRIVERS_PATH"] + "chromedriver")
         self.articles_scraped = 0
 
-    def __del__(self):
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
         """
-        Sends an email and closes the selenium driver when the spider is deleted
+        Connects the spider signals
+        """
+        spider = super(MetricsSpider, cls).from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+
+        return spider
+
+    def spider_closed(self, spider):
+        """
+        Sends an email and closes the selenium driver when the spider is closed
         """
         mailer = MailSender(
             smtphost="smtp.gmail.com",
