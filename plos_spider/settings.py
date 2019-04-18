@@ -31,7 +31,7 @@ ROBOTSTXT_OBEY = True
 # logging levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
 LOG_ENABLED = True
 LOG_FILE = "tmp/log.txt"
-LOG_LEVEL = "WARNING"
+LOG_LEVEL = "INFO"
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32

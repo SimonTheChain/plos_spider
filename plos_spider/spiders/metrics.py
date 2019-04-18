@@ -2,7 +2,6 @@
 
 
 import os
-import datetime
 
 import scrapy
 from scrapy.loader import ItemLoader
@@ -123,11 +122,7 @@ class MetricsSpider(scrapy.Spider):
         self.logger.debug("Tags: {}".format(tags))
 
         publish_string = response.xpath('//*[@id="artPubDate"]/text()').extract_first()
-        publish_datetime = datetime.datetime.strptime(
-            publish_string,
-            "Published: %B %d, %Y"
-        )
-        self.logger.debug("Publish Datetime: {}".format(publish_datetime))
+        self.logger.debug("Publish Date: {}".format(publish_string))
 
         # create item instance
         metrics_loader = ItemLoader(item=MetricsItem(), selector=tags_container)
@@ -135,7 +130,7 @@ class MetricsSpider(scrapy.Spider):
         # populate item
         metrics_loader.add_value('views', views.text)
         metrics_loader.add_value('tags', tags)
-        metrics_loader.add_value('publish_date', publish_datetime)
+        metrics_loader.add_value('publish_date', publish_string)
 
         # commit item
         yield metrics_loader.load_item()
