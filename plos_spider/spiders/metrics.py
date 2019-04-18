@@ -112,10 +112,10 @@ class MetricsSpider(scrapy.Spider):
 
         # skip the article if the dynamic element has not been found
         except TimeoutException:
-            return
+            return self.logger.warning("Article skipped: {}".format(response.url))
 
         if not views:
-            return
+            return self.logger.warning("Article skipped: {}".format(response.url))
 
         # we can use scrapy to gather the rest of the data
         tags_container = response.xpath('//*[@id="subjectList"]')
