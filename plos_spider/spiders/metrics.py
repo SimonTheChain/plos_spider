@@ -32,6 +32,7 @@ class MetricsSpider(scrapy.Spider):
         super().__init__(**kwargs)
         self.driver = webdriver.Chrome(os.environ["WEBDRIVERS_PATH"] + "chromedriver")
         self.articles_scraped = 0
+        self.articles_skipped = []
 
     def parse(self, response):
         """
@@ -59,6 +60,14 @@ class MetricsSpider(scrapy.Spider):
 
         if next_page_url is not None:
             yield response.follow(next_page_url, callback=self.parse)
+
+        # retry skipped articles
+        if self.settings.getbool("RETRY_SKIPPED"):
+            if self.articles_skipped:
+
+                while len(self.articles_skipped) > 0:
+                    article = self.articles_skipped.pop()
+                    self.parse_article(article)
 
     def parse_article(self, response):
         """
@@ -88,11 +97,14 @@ class MetricsSpider(scrapy.Spider):
                     error=e
                 )
             )
+            self.articles_skipped.append(response)
             yield None
 
         else:
             # skip the article if the dynamic element has not been found
             if views is None:
+                self.logger.warning("Article skipped: {url}".format(url=response.url))
+                self.articles_skipped.append(response.url)
                 yield None
 
             else:

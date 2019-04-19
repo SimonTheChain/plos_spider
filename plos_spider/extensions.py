@@ -40,17 +40,21 @@ class ClosingActions(object):
             smtpport=587,
         )
 
-        msg_body = "Web crawling job completed: {} articles scraped.".format(
-            spider.articles_scraped
+        results_msg = "Web crawling job completed:\n{} articles scraped\n{} articles skipped".format(
+            spider.articles_scraped,
+            len(spider.articles_skipped)
         )
 
         mailer.send(
             to=os.environ["EMAIL_RECEIVER"],
             subject="Web Crawling Results",
-            body=msg_body,
+            body=results_msg,
             # cc=[""]
         )
 
         # close the selenium driver
         spider.logger.info("Closing driver...")
         spider.driver.close()
+
+        # log results
+        spider.logger.info(results_msg)

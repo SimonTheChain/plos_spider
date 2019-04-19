@@ -33,6 +33,9 @@ LOG_ENABLED = True
 LOG_FILE = "tmp/log.txt"
 LOG_LEVEL = "INFO"
 
+# Retry skipped articles
+RETRY_SKIPPED = False
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
