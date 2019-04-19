@@ -12,7 +12,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from ..items import MetricsItem
+from plos_spider.items import MetricsItem
 
 
 class MetricsSpider(scrapy.Spider):
