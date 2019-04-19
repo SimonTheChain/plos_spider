@@ -39,12 +39,11 @@ class MetricsSpider(scrapy.Spider):
         :param response: http response object
         :return: next page if not None
         """
-        self.logger.info("Crawling page...")
+        self.logger.info("Crawling page: {}".format(response.url))
         search_results = response.xpath('//*[@class="article-block"]/div')
 
         if len(search_results) == 0:
-            self.logger.error("No article block found")
-            yield
+            return self.logger.error("No article block found")
 
         for article in search_results:
             article_link = article.xpath('./h2/a/@href').extract_first()
@@ -67,10 +66,8 @@ class MetricsSpider(scrapy.Spider):
         :param response: http response object
         :return: new metrics item
         """
-        views = None
-
-        # the view count is generated with javascript so we need to use selenium
         try:
+            # the view count is generated with javascript so we need to use selenium
             self.driver.get(response.url)
 
             # wait for the dynamic element to be present
@@ -83,29 +80,37 @@ class MetricsSpider(scrapy.Spider):
             )
             self.logger.debug("View Count: {}".format(views.text))
 
-        # skip the article if the dynamic element has not been found
-        except TimeoutException:
-            self.logger.warning("Article skipped: {}".format(response.url))
-            yield
+        # skip the article if the page times out
+        except TimeoutException as e:
+            self.logger.warning(
+                "Article skipped: {url}\n{error}".format(
+                    url=response.url,
+                    error=e
+                )
+            )
+            yield None
 
-        if not views:
-            yield
+        else:
+            # skip the article if the dynamic element has not been found
+            if views is None:
+                yield None
 
-        # we can use scrapy to gather the rest of the data
-        tags_container = response.xpath('//*[@id="subjectList"]')
-        tags = tags_container.xpath('.//@data-categoryname').extract()
-        self.logger.debug("Tags: {}".format(tags))
+            else:
+                # we can use scrapy to gather the rest of the data
+                tags_container = response.xpath('//*[@id="subjectList"]')
+                tags = tags_container.xpath('.//@data-categoryname').extract()
+                self.logger.debug("Tags: {}".format(tags))
 
-        publish_string = response.xpath('//*[@id="artPubDate"]/text()').extract_first()
-        self.logger.debug("Publish Date: {}".format(publish_string))
+                publish_string = response.xpath('//*[@id="artPubDate"]/text()').extract_first()
+                self.logger.debug("Publish Date: {}".format(publish_string))
 
-        # create item instance
-        metrics_loader = ItemLoader(item=MetricsItem(), selector=tags_container)
+                # create item instance
+                metrics_loader = ItemLoader(item=MetricsItem(), selector=tags_container)
 
-        # populate item
-        metrics_loader.add_value('views', views.text)
-        metrics_loader.add_value('tags', tags)
-        metrics_loader.add_value('publish_date', publish_string)
+                # populate item
+                metrics_loader.add_value('views', views.text)
+                metrics_loader.add_value('tags', tags)
+                metrics_loader.add_value('publish_date', publish_string)
 
-        # commit item
-        yield metrics_loader.load_item()
+                # commit item
+                yield metrics_loader.load_item()

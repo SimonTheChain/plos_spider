@@ -29,7 +29,7 @@ class ClosingActions(object):
         """
         Sends an email and closes the selenium driver when the spider is closed
         """
-        spider.logger.debug("Sending email...")
+        spider.logger.info("Sending email...")
         mailer = MailSender(
             smtphost="smtp.gmail.com",
             mailfrom=os.environ["EMAIL_SENDER"],
@@ -52,5 +52,5 @@ class ClosingActions(object):
         )
 
         # close the selenium driver
-        spider.logger.debug("Closing driver...")
+        spider.logger.info("Closing driver...")
         spider.driver.close()
