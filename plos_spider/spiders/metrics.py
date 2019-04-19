@@ -43,7 +43,8 @@ class MetricsSpider(scrapy.Spider):
         search_results = response.xpath('//*[@class="article-block"]/div')
 
         if len(search_results) == 0:
-            return self.logger.error("No article block found")
+            self.logger.error("No article block found")
+            yield
 
         for article in search_results:
             article_link = article.xpath('./h2/a/@href').extract_first()
@@ -66,6 +67,8 @@ class MetricsSpider(scrapy.Spider):
         :param response: http response object
         :return: new metrics item
         """
+        views = None
+
         # the view count is generated with javascript so we need to use selenium
         try:
             self.driver.get(response.url)
@@ -74,7 +77,7 @@ class MetricsSpider(scrapy.Spider):
             views = WebDriverWait(
                 driver=self.driver,
                 timeout=10,
-                poll_frequency=1000,
+                # poll_frequency=500,
             ).until(
                 EC.presence_of_element_located((By.ID, "almViews"))
             )
@@ -82,10 +85,11 @@ class MetricsSpider(scrapy.Spider):
 
         # skip the article if the dynamic element has not been found
         except TimeoutException:
-            return self.logger.warning("Article skipped: {}".format(response.url))
+            self.logger.warning("Article skipped: {}".format(response.url))
+            yield
 
         if not views:
-            return self.logger.warning("Article skipped: {}".format(response.url))
+            yield
 
         # we can use scrapy to gather the rest of the data
         tags_container = response.xpath('//*[@id="subjectList"]')

@@ -82,11 +82,10 @@ ITEM_PIPELINES = {
 }
 
 # export
+AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 FEED_FORMAT = "json"
-FEED_URI = "s3://{username}:{password}@plos/%(name)s/%(time)s.json".format(
-    username=os.environ['AWS_ACCESS_KEY_ID'],
-    password=os.environ['AWS_SECRET_ACCESS_KEY'],
-)
+FEED_URI = "s3://plos/%(name)s/%(time)s.json"
 # FEED_EXPORT_FIELDS = ["views", "publish_date", "views_per_day", "tags",]  # for csv
 
 # Enable and configure the AutoThrottle extension (disabled by default)
